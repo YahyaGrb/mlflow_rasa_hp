@@ -75,7 +75,7 @@ def  workflow(config,training, validation):
 
 if __name__ == "__main__":
     training_files = "training_data.yml"
-    config_file_path = "/Users/yahyaghrab/dial-once/VF scripts/VattenFall/config.yml"
+    config_file_path = "config.yml"
     validation_files = "test_data.yml"
     import os
     os.system("spacy download fr_core_news_md") # try to get it improved and done withing venv
