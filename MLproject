@@ -1,0 +1,15 @@
+name: multistep_example
+
+python_env: python_env.yaml
+
+entry_points:
+  train:
+    # parameters:
+    #     file_importer: E2EImporter
+    command: "python train.py"
+  test:
+    # parameters:
+    #     file_importer: E2EImporter
+    command: "python test.py"
+  main:
+    command: "python main.py"
