@@ -1,0 +1,30 @@
+version: "3.1"
+nlu:
+- intent: bot_challenge
+  examples: |
+    - am I talking to a bot?
+- intent: affirm
+  examples: |
+    - y
+- intent: deny
+  examples: |
+    - no
+    - no way
+- intent: goodbye
+  examples: |
+    - have a nice day
+    - good night
+- intent: greet
+  examples: |
+    - good evening
+    - moin
+- intent: mood_great
+  examples: |
+    - great
+    - I am amazing
+    - I am feeling very good
+- intent: mood_unhappy
+  examples: |
+    - not very good
+    - I am sad
+    - so sad

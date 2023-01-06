@@ -1,0 +1,70 @@
+version: "3.1"
+nlu:
+- intent: bot_challenge
+  examples: |
+    - are you a bot?
+    - am I talking to a human?
+    - are you a human?
+- intent: affirm
+  examples: |
+    - that sounds good
+    - indeed
+    - of course
+    - correct
+    - yes
+- intent: deny
+  examples: |
+    - don't like that
+    - n
+    - not really
+    - never
+    - I don't think so
+- intent: goodbye
+  examples: |
+    - good by
+    - bye bye
+    - see you later
+    - cee you later
+    - goodbye
+    - bye
+    - cu
+    - see you around
+- intent: greet
+  examples: |
+    - good afternoon
+    - hello there
+    - hi
+    - goodevening
+    - good morning
+    - hey dude
+    - let's go
+    - hey
+    - goodmorning
+    - hey there
+    - hello
+- intent: mood_great
+  examples: |
+    - super stoked
+    - so so perfect
+    - I am great
+    - amazing
+    - wonderful
+    - extremely good
+    - perfect
+    - feeling like a king
+    - so good
+    - I am going to save the world
+    - so perfect
+- intent: mood_unhappy
+  examples: |
+    - extremly sad
+    - unhappy
+    - super sad
+    - so saad
+    - my day was horrible
+    - not good
+    - I'm so sad
+    - sad
+    - I don't feel very well
+    - very sad
+    - I am disappointed
