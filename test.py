@@ -43,7 +43,11 @@ def train_and_evaluate_nlu_model(model_path, validation):
             ))
         support = extract_metric(f"{temp_results_dir}/intent_report.json","support")
         f1_intent = extract_metric(f"{temp_results_dir}/intent_report.json","f1-score")
-        f1_entity = extract_metric(f"{temp_results_dir}/DIETClassifier_report.json","f1-score")
+        try:
+            f1_entity = extract_metric(f"{temp_results_dir}/DIETClassifier_report.json","f1-score") # if it crashes, you probably didin't use entites, either add entities or remove this line
+        except FileNotFoundError:
+            print("need to add entities")
+            f1_entity = 0
         mlflow.log_artifacts(temp_results_dir,  artifact_path="reports")
 
     end_time = time.time()

@@ -2,7 +2,7 @@ version: "3.1"
 nlu:
 - intent: bot_challenge
   examples: |
-    - am I talking to a bot?
+    - am I talking to a [bot](type)?
 - intent: affirm
   examples: |
     - y
