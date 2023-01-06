@@ -1,5 +1,7 @@
 import tempfile
 import mlflow
+import time
+
 
 from rasa.shared.importers.importer import TrainingDataImporter
 from rasa.engine.recipes.recipe import Recipe
@@ -13,13 +15,16 @@ from rasa.model_training import (
     _create_model_storage,
     _determine_model_name,
 )
+from rasa.model_training import train_nlu
+
 
 import click
 
-@click.command()
-@click.option("--config", help="Path readable by Spark to the ratings Parquet file")
-@click.option("--training", help="Path readable by Spark to the ratings Parquet file")
+# @click.command()
+# @click.option("--config", help="Path readable by Spark to the ratings Parquet file")
+# @click.option("--training", help="Path readable by Spark to the ratings Parquet file")
 def train(config, training, output_path="models", training_type=TrainingType.NLU):
+    start_time = time.time()
     file_importer = TrainingDataImporter.load_from_config(
             config_path = config, training_data_paths = training
     )
@@ -53,18 +58,25 @@ def train(config, training, output_path="models", training_type=TrainingType.NLU
             force_retraining=False,
             is_finetuning=False,
         )
+        end_time = time.time()
+        print(f"Training time: {end_time - start_time}")
+        start_time = time.time()
+        model_path = train_nlu(config=config, nlu_data=training, output="models")
+        print(model_path)
+        end_time = time.time()
+        print(f"Training time: {end_time - start_time}")
         mlflow.log_artifact(full_model_path, artifact_path="model")
         mlflow.log_artifact(config, artifact_path="config")
 
         return TrainingResult(str(full_model_path), 0)
 
 if __name__ == '__main__':
-    train()
+    # train()
     # for manual execution uncomment following and comment preceding
-    # config_file_path = "/Users/yahyaghrab/dial-once/VF scripts/VattenFall/config.yml"
-    # training_files = "training_data.yml"
+    config_file_path = "config.yml"
+    training_files = "training_data.yml"
 
-    # train_res = train(config_file_path,training_files) # replace with train_nlu and see which is faster
+    train_res = train(config_file_path,training_files) # replace with train_nlu and see which is faster
 
-    # print("train completed")
-    # print("model path: ", train_res[0])
+    print("train completed")
+    print("model path: ", train_res[0])
