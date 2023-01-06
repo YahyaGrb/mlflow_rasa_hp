@@ -21,7 +21,7 @@ import click
 @click.option("--training", help="Path readable by Spark to the ratings Parquet file")
 def train(config, training, output_path="models", training_type=TrainingType.NLU):
     file_importer = TrainingDataImporter.load_from_config(
-            config, training
+            config_path = config, training_data_paths = training
     )
     configuration = file_importer.get_config()
     recipe = Recipe.recipe_for_name(configuration.get("recipe"))
