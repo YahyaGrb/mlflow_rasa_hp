@@ -31,12 +31,6 @@ def _transform_uri_to_path(uri):
 
 
 def _get_or_run(entrypoint, parameters, synchronous=True): #removed git commit and use_cache=True
-    # existing_run = _already_ran(entrypoint, parameters, git_commit)
-    # if use_cache and existing_run:
-    #     print(
-    #         "Found existing run for entrypoint={} and parameters={}".format(entrypoint, parameters)
-    #     )
-    #     return existing_run
     logger.info("Launching new run for entrypoint={} and parameters={}".format(entrypoint, parameters))
     submitted_run = mlflow.run(".", entrypoint, parameters=parameters, env_manager="local", synchronous = synchronous)
     return MlflowClient().get_run(submitted_run.run_id)
@@ -45,6 +39,8 @@ def _get_or_run(entrypoint, parameters, synchronous=True): #removed git commit a
 
 def  workflow(config,training, validation):
     with mlflow.start_run() as active_run:
+        mlflow.set_experiment("MLProject workflow full experiment")
+
         # os.environ["SPARK_CONF_DIR"] = os.path.abspath(".")
         # git_commit = active_run.data.tags.get(mlflow_tags.MLFLOW_GIT_COMMIT)
         logger.info("Starting to train")
@@ -56,27 +52,12 @@ def  workflow(config,training, validation):
         logger.info("Starting to test")
         test_model = _get_or_run("test", {"model_path": model_path, "validation": validation})
         logger.info("Testing complete")
-        # ratings_parquet_uri = os.path.join(etl_data_run.info.artifact_uri, "ratings-parquet-dir")
-
-        # # We specify a spark-defaults.conf to override the default driver memory. ALS requires
-        # # significant memory. The driver memory property cannot be set by the application itself.
-        # als_run = _get_or_run(
-        #     "als", {"ratings_data": ratings_parquet_uri, "max_iter": str(als_max_iter)}, git_commit
-        # )
-        # als_model_uri = os.path.join(als_run.info.artifact_uri, "als-model")
-
-        # keras_params = {
-        #     "ratings_data": ratings_parquet_uri,
-        #     "als_model_uri": als_model_uri,
-        #     "hidden_units": keras_hidden_units,
-        # }
-        # _get_or_run("train_keras", keras_params, git_commit, use_cache=False)
 
 
 if __name__ == "__main__":
-    training_files = "training_data.yml"
-    config_file_path = "config.yml"
-    validation_files = "test_data.yml"
+    training_files = "files/training_data.yml"
+    config_file_path = "files/config.yml"
+    validation_files = "files/test_data.yml"
     import os
     os.system("spacy download fr_core_news_md") # try to get it improved and done withing venv
     workflow(config_file_path,training_files,validation_files)
