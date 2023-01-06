@@ -57,7 +57,6 @@ def personnalised_trainer(config, training, training_type=TrainingType.NLU): #fo
         return duration
 
 def fast_trainer(config, training):
-    mlflow.set_experiment("Trains")
     with tempfile.TemporaryDirectory() as temp_model_dir:
         start_time = time.time()
         model_path = train_nlu(config=config, nlu_data=training, output=temp_model_dir, additional_arguments = {}) #faster
@@ -68,19 +67,19 @@ def fast_trainer(config, training):
 
 
 
-# @click.command()
-# @click.option("--config", help="Path readable by Spark to the ratings Parquet file")
-# @click.option("--training", help="Path readable by Spark to the ratings Parquet file")
+@click.command()
+@click.option("--config", help="Path pointing to the config.yml file")
+@click.option("--training", help="Path pointing to nlu training yml file")
 def train(config, training):
     duration = fast_trainer(config, training)
     mlflow.log_metric("train_duration", duration)
     mlflow.log_artifact(config, artifact_path="config")
 
 if __name__ == '__main__':
-    # train()
-    # for manual execution uncomment following and comment preceding
-    config_file_path = "config.yml"
-    training_files = "training_data.yml"
+    train()
+    # # for manual execution uncomment following and comment preceding
+    # config_file_path = "config.yml"
+    # training_files = "training_data.yml"
 
-    train(config_file_path,training_files) # replace with train_nlu and see which is faster
-    print("train completed")
+    # train(config_file_path,training_files) # replace with train_nlu and see which is faster
+    # print("train completed")
