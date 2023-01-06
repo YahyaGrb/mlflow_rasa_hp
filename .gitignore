@@ -129,4 +129,7 @@ dmypy.json
 .pyre/
 
 #mlops
- mlruns/
+mlruns/
+
+#rasa
+.rasa/
