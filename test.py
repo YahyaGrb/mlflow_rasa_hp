@@ -24,15 +24,11 @@ def extract_metric(file, metric_name):
 #     if component["name"] == "DIETClassifier"][0]
 
 
-# import Path
-
 import click
-import os
-# @click.command()
-# @click.option("--model_path", help="Path readable by Spark to the ratings Parquet file")
-# @click.option("--validation", help="Path readable by Spark to the ratings Parquet file")
+@click.command()
+@click.option("--model_path", help="Path txt pointing to the last trained model in mlrun files")
+@click.option("--validation", help="Path pointing to the validation files")
 def train_and_evaluate_nlu_model(model_path, validation):
-    mlflow.set_experiment("Tests")
     start_time = time.time()
 
     with tempfile.TemporaryDirectory() as temp_results_dir:
@@ -64,6 +60,8 @@ def train_and_evaluate_nlu_model(model_path, validation):
     }
 
 if __name__=="__main__":
-    model_path = "mlruns/510145974657371863/4c944a69c2634bccb27cec407d2cf085/artifacts/model"
-    validation = "test_data.yml"
-    train_and_evaluate_nlu_model(model_path, validation)
+    train_and_evaluate_nlu_model()
+    # # for manual execution uncomment following and comment precceding
+    # model_path = "mlruns/510145974657371863/4c944a69c2634bccb27cec407d2cf085/artifacts/model"
+    # validation = "test_data.yml"
+    # train_and_evaluate_nlu_model(model_path, validation)
