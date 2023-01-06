@@ -95,6 +95,6 @@ def train_and_evaluate_nlu_model(model_path, validation):
     }
 
 if __name__=="__main__":
-    model_path = "/Users/yahyaghrab/dial-once/nlu-hp/nlu-hyperopt/nlu_hyperopt/mlruns/0/e59dfe032aec460c9af705de5ad53e6a/artifacts/model/20221222-175225-square-pique.tar.gz"
+    model_path = "/mlruns/0/e59dfe032aec460c9af705de5ad53e6a/artifacts/model/20221222-175225-square-pique.tar.gz"
     validation = "./test_data.yml"
     train_and_evaluate_nlu_model(model_path, validation)
