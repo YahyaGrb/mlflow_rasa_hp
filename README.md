@@ -7,3 +7,5 @@ You need to have a virtual env with an mlops installed to be able to run mlflow 
 Doing some advanced rasa tweaking.
 
 To run the full project, you just need to clone it then run: `mlflow run .`
+
+You can then cd to the project and run in another terminal `mlflow ui` to see the results
