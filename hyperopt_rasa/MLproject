@@ -1,0 +1,27 @@
+name: hyperopt_example
+
+# python_env: python_env.yaml
+
+entry_points:
+  train:
+    # parameters:
+    #     file_importer: E2EImporter
+    command: "python train.py"
+  test:
+    # parameters:
+    #     file_importer: E2EImporter
+    command: "python test.py"
+  main:
+    parameters:
+          max_runs: {type: int, default: 10}
+          metric: {type: string, default: "f1_intent"}
+          algo: {type: string, default: "tpe.suggest"}
+          train_data: {type: string, default: "mlops_rasa/files/train_data.yml"}
+          config_template: {type: string, default: "mlops_rasa/files/template_config.yml"}
+          validation_data: {type: string, default: "mlops_rasa/files/test_data.yml"}
+    command: "python main.py
+                            --max-runs {max_runs}
+                            --metric {metric}
+                            --algo {algo}
+                             {validation_data}
+                             {train_data}  {config_template}"

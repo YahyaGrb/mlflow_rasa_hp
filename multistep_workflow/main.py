@@ -28,7 +28,8 @@ def _transform_uri_to_path(uri):
 def _get_or_run(entrypoint, parameters, synchronous=True): #removed git commit and use_cache=True
     logger.info("Launching new run for entrypoint={} and parameters={}".format(entrypoint, parameters))
     submitted_run = mlflow.run(".", entrypoint, parameters=parameters, env_manager="local", synchronous = synchronous)
-    return MlflowClient().get_run(submitted_run.run_id)
+    succeeded = submitted_run.wait()
+    return MlflowClient().get_run(submitted_run.run_id), succeeded
 
 
 

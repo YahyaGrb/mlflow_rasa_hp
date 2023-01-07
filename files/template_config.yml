@@ -1,0 +1,30 @@
+# The config recipe.
+# https://rasa.com/docs/rasa/model-configuration/
+recipe: default.v1
+
+language: fr
+
+pipeline:
+  - name: "SpacyNLP"
+    model: {model}
+  #   # model: "fr_dep_news_trf" #test 10X larger model -> lower performance ...
+    case_sensitive: false
+  - name: "SpacyTokenizer" # Tokenizer that understands French to seperate sentences with the ' (d'application)
+  # - name: WhitespaceTokenizer
+  - name: RegexFeaturizer
+  - name: LexicalSyntacticFeaturizer
+  - name: CountVectorsFeaturizer
+  - name: CountVectorsFeaturizer
+    analyzer: char_wb
+    #char_wb
+    min_ngram: 1
+    max_ngram: 10
+  - name: DIETClassifier
+    epochs: {epochs}
+    random_seed: 12
+    # use_masked_language_model: true
+    constrain_similarities: true
+  - name: EntitySynonymMapper
+  - name: FallbackClassifier
+    threshold: {threshold}
+    ambiguity_threshold: 0.05
