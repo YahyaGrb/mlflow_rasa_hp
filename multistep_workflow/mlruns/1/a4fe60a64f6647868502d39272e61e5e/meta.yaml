@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/yahyaghrab/dial-once/sandbox/gh/mlops_rasa/mlruns/1/a4fe60a64f6647868502d39272e61e5e/artifacts
+end_time: 1673046472092
+entry_point_name: ''
+experiment_id: '1'
+lifecycle_stage: active
+run_id: a4fe60a64f6647868502d39272e61e5e
+run_name: nosy-goat-715
+run_uuid: a4fe60a64f6647868502d39272e61e5e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1673046416582
+status: 3
+tags: []
+user_id: yghrab

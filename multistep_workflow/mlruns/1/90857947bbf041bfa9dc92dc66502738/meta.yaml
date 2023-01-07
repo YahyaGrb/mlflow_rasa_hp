@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/yahyaghrab/dial-once/sandbox/gh/mlops_rasa/mlruns/1/90857947bbf041bfa9dc92dc66502738/artifacts
+end_time: 1673046791967
+entry_point_name: ''
+experiment_id: '1'
+lifecycle_stage: active
+run_id: 90857947bbf041bfa9dc92dc66502738
+run_name: worried-fox-180
+run_uuid: 90857947bbf041bfa9dc92dc66502738
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1673046778574
+status: 3
+tags: []
+user_id: yghrab

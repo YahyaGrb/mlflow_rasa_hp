@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/yahyaghrab/dial-once/sandbox/gh/mlops_rasa/mlruns/1/315a43112360402d9f65950ec41c7ccc/artifacts
+end_time: 1673045902219
+entry_point_name: ''
+experiment_id: '1'
+lifecycle_stage: active
+run_id: 315a43112360402d9f65950ec41c7ccc
+run_name: orderly-skunk-87
+run_uuid: 315a43112360402d9f65950ec41c7ccc
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1673045876317
+status: 4
+tags: []
+user_id: yghrab
