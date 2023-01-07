@@ -14,14 +14,15 @@ entry_points:
   main:
     parameters:
           max_runs: {type: int, default: 10}
-          metric: {type: string, default: "f1_intent"}
+          metric: {type: string, default: "f1-intent"}
           algo: {type: string, default: "tpe.suggest"}
-          train_data: {type: string, default: "mlops_rasa/files/train_data.yml"}
-          config_template: {type: string, default: "mlops_rasa/files/template_config.yml"}
-          validation_data: {type: string, default: "mlops_rasa/files/test_data.yml"}
+          config_template: {type: string, default: "../files/template_config.yml"}
+          train_data: {type: string, default: "../files/training_data.yml"}
+          validation_data: {type: string, default: "../files/test_data.yml"}
     command: "python main.py
                             --max-runs {max_runs}
                             --metric {metric}
                             --algo {algo}
-                             {validation_data}
-                             {train_data}  {config_template}"
+                             {config_template}
+                             {train_data}
+                             {validation_data}"

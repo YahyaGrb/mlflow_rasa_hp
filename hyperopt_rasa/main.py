@@ -38,14 +38,12 @@ def _transform_uri_to_path(uri):
     return os.path.join(abs_path, file)
 
 
-@click.command(
-    help="Perform hyperparameter search with Hyperopt library. Optimize dl_train target."
-)
-@click.argument("train_data", default="mlops_rasa/files/train_data.yml")
-@click.argument("config_template", default="mlops_rasa/files/template_config.yml")
-@click.argument("validation_data", default="mlops_rasa/files/test_data.yml")
+@click.command(help="Perform hyperparameter search with Hyperopt library. Optimize dl_train target.")
+@click.argument("config_template", default="../files/template_config.yml")
+@click.argument("train_data", default="../files/training_data.yml")
+@click.argument("validation_data", default="../files/test_data.yml")
 @click.option("--max-runs", type=click.INT, default=10, help="Maximum number of runs to evaluate.")
-@click.option("--metric", type=click.STRING, default="f1_intent", help="Metric to optimize on.")
+@click.option("--metric", type=click.STRING, default="f1-intent", help="Metric to optimize on.")
 @click.option("--algo", type=click.STRING, default="tpe.suggest", help="Optimizer algorithm.")
 
 def workflow(config_template, train_data, validation_data,max_runs, metric, algo):
@@ -86,7 +84,9 @@ def workflow(config_template, train_data, validation_data,max_runs, metric, algo
                 # Creating temporary config file containing space variables
                 os.makedirs('./tmp_configs', exist_ok=True)
                 config_path = "./tmp_configs/run_config.yml"
-                config_template_path = os.path.abspath(config_template)
+                config_template_path = os.path.relpath(config_template)
+                train_data_path = os.path.relpath(train_data)
+                validation_data_path = os.path.relpath(validation_data)
 
                 with open(config_template_path) as f:
                     template_config_yml = f.read().format(**space)
@@ -94,15 +94,16 @@ def workflow(config_template, train_data, validation_data,max_runs, metric, algo
                         temp_f.write(template_config_yml)
 
                 logger.info("Starting to train")
-                train_model = _get_or_run("train", {"config":config_path, "training":train_data}, child_run.info.run_id,experiment_id)
+                train_model = _get_or_run("train", {"config":config_path, "training":train_data_path}, child_run.info.run_id,experiment_id)
                 logger.info("Training complete")
                 model_uri = os.path.join(train_model.info.artifact_uri, "model")
                 logger.info(model_uri)
                 model_path = _transform_uri_to_path(model_uri)
                 logger.info("Starting to test")
-                test_model = _get_or_run("test", {"model_path": model_path, "validation": validation_data}, child_run.info.run_id,experiment_id)
+                test_model = _get_or_run("test", {"model_path": model_path, "validation": validation_data_path}, child_run.info.run_id,experiment_id)
                 logger.info("Testing complete")
                 metrics = test_model.data.metrics
+                print(metrics)
                 test_loss = 1 - metrics[metric]
                 mlflow.log_params(params = space)
             return test_loss
@@ -158,5 +159,4 @@ if __name__ == "__main__":
     # os.system("spacy download fr_core_news_md") # try to get it improved and done withing venv
     # os.system("spacy download fr_core_news_sm") # try to get it improved and done withing venv
     # os.system("spacy download fr_dep_news_trf") # try to get it improved and done withing venv
-
     workflow()
