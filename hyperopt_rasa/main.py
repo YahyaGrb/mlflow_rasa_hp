@@ -47,7 +47,7 @@ def _transform_uri_to_path(uri):
 @click.option("--max-runs", type=click.INT, default=10, help="Maximum number of runs to evaluate.")
 @click.option("--metric", type=click.STRING, default="f1-intent", help="Metric to optimize on.")
 @click.option("--algo", type=click.STRING, default="tpe.suggest", help="Optimizer algorithm.")
-def workflow(config_template, train_data, validation_data,max_runs, metric, algo, max_p):
+def workflow(config_template, train_data, validation_data,max_runs, metric, algo):
     """
     Run hyperparameter optimization.
     """
@@ -122,7 +122,7 @@ def workflow(config_template, train_data, validation_data,max_runs, metric, algo
         experiment_id = run.info.experiment_id
         # activate multithreading
         runs = [(np.random.uniform(1e-5, 1e-1), np.random.uniform(0, 1.0)) for _ in range(max_runs)]
-        with ThreadPoolExecutor(max_workers=max_runs) as executor:
+        with ThreadPoolExecutor(max_workers=max_runs) as executor: # use max_runs for number of workers/threads
             best = executor.map(
                 fmin(
                     fn=new_eval(experiment_id),
