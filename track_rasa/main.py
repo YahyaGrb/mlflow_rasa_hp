@@ -54,5 +54,4 @@ if __name__ == "__main__":
     training_files = "../files/track/training_data.yml"
     config_file_path = "../files/track/config.yml"
     validation_files = "../files/track/test_data.yml"
-    import os
     workflow(config_file_path,training_files,validation_files)
