@@ -41,9 +41,9 @@ def _transform_uri_to_path(uri):
 
 
 @click.command(help="Perform hyperparameter search with Hyperopt library. Optimize dl_train target.")
-@click.argument("config_template", default="../files/template_config.yml")
-@click.argument("train_data", default="../files/training_data.yml")
-@click.argument("validation_data", default="../files/test_data.yml")
+@click.argument("config_template", default="../files/hyperopt/template_config.yml")
+@click.argument("train_data", default="../files/hyperopt/training_data.yml")
+@click.argument("validation_data", default="../files/hyperopt/test_data.yml")
 @click.option("--max-runs", type=click.INT, default=10, help="Maximum number of runs to evaluate.")
 @click.option("--metric", type=click.STRING, default="f1-intent", help="Metric to optimize on.")
 @click.option("--algo", type=click.STRING, default="tpe.suggest", help="Optimizer algorithm.")
