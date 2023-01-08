@@ -1,6 +1,7 @@
 from hyperopt import fmin, tpe, rand, space_eval
 from space import search_space
 import os
+import time
 import logging
 import sys
 import mlflow
@@ -8,6 +9,7 @@ import numpy as np
 import click
 from urllib.parse import urlparse
 
+from concurrent.futures import ThreadPoolExecutor
 
 import mlflow.projects
 from mlflow.tracking import MlflowClient
@@ -20,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 def _get_or_run(entrypoint, parameters, run_id, experiment_id, synchronous=True): #removed git commit and use_cache=True
     logger.info("Launching new run for entrypoint={} and parameters={}".format(entrypoint, parameters))
-    submitted_run = mlflow.run(".", entrypoint, parameters=parameters, env_manager="local", synchronous = synchronous, run_id=run_id, experiment_id=experiment_id)
+    submitted_run = mlflow.projects.run(".", entrypoint, parameters=parameters, env_manager="local", synchronous = synchronous, run_id=run_id, experiment_id=experiment_id)
     succeeded = submitted_run.wait()
     return MlflowClient().get_run(submitted_run.run_id)
 
@@ -45,13 +47,13 @@ def _transform_uri_to_path(uri):
 @click.option("--max-runs", type=click.INT, default=10, help="Maximum number of runs to evaluate.")
 @click.option("--metric", type=click.STRING, default="f1-intent", help="Metric to optimize on.")
 @click.option("--algo", type=click.STRING, default="tpe.suggest", help="Optimizer algorithm.")
-
-def workflow(config_template, train_data, validation_data,max_runs, metric, algo):
+def workflow(config_template, train_data, validation_data,max_runs, metric, algo, max_p):
     """
     Run hyperparameter optimization.
     """
     # create random file to store run ids of the training tasks
     # tracking_client = MlflowClient()
+    start_time = time.time()
 
     def new_eval(experiment_id):
         """
@@ -118,45 +120,42 @@ def workflow(config_template, train_data, validation_data,max_runs, metric, algo
 
     with mlflow.start_run() as run:
         experiment_id = run.info.experiment_id
-        # Evaluate null model first.
-        best = fmin(
-            fn=new_eval(experiment_id),
-            space=search_space,
-            algo=tpe.suggest if algo == "tpe.suggest" else rand.suggest,
-            max_evals=max_runs,
-        )
-        mlflow.set_tag("best params", str(best))
-        logger.info("Hyperparameter search complete!")
-
-        best_config = space_eval(search_space, best)
-        logger.info(f"The best values are: {best_config}")
-
-        with open(config_template) as f:
-            config_yml = f.read().format(**best_config)
-            logger.info("The best configuration is: \n{}\n".format(config_yml))
-        # find the best run, log its metrics as the final metrics of this run.
-        client = MlflowClient()
-        runs = client.search_runs(
-            [experiment_id], "tags.mlflow.parentRunId = '{run_id}' ".format(run_id=run.info.run_id)
-        )
-        best_test_loss = _inf
-        best_run = None
-        for r in runs:
-            if r.data.metrics[metric] < best_test_loss:
-                best_run = r
-                best_test_loss = r.data.metrics[metric]
-        mlflow.set_tag("best_run", best_run.info.run_id)
-        mlflow.log_metrics(
-            {
-                "test_{}".format(metric): best_test_loss,
-            }
-        )
+        # activate multithreading
+        runs = [(np.random.uniform(1e-5, 1e-1), np.random.uniform(0, 1.0)) for _ in range(max_runs)]
+        with ThreadPoolExecutor(max_workers=max_runs) as executor:
+            best = executor.map(
+                fmin(
+                    fn=new_eval(experiment_id),
+                    space=search_space,
+                    algo=tpe.suggest if algo == "tpe.suggest" else rand.suggest,
+                    max_evals=max_runs),
+                runs,
+            )
+            logger.info("Hyperparameter search complete!")
+            # find the best run, log its metrics as the final metrics of this run.
+            client = MlflowClient()
+            runs = client.search_runs(
+                [experiment_id], "tags.mlflow.parentRunId = '{run_id}' ".format(run_id=run.info.run_id)
+            )
+            best_test_loss = _inf
+            best_run = None
+            for r in runs:
+                if r.data.metrics[metric] < best_test_loss:
+                    best_run = r
+                    best_test_loss = r.data.metrics[metric]
+                    # get best config here
+                    # with open(config_template) as f:
+                    #     config_yml = f.read().format(**best_config)
+                    #     logger.info("The best configuration is: \n{}\n".format(config_yml))
+            mlflow.set_tag("best_run", best_run.info.run_id)
+            mlflow.log_metrics(
+                {
+                    "Best_{}".format(metric): best_test_loss,
+                }
+            )
+    print(f"Total execution time: {time.time() - start_time} seconds")
 
 
 
 if __name__ == "__main__":
-    import os
-    # os.system("spacy download fr_core_news_md") # try to get it improved and done withing venv
-    # os.system("spacy download fr_core_news_sm") # try to get it improved and done withing venv
-    # os.system("spacy download fr_dep_news_trf") # try to get it improved and done withing venv
     workflow()

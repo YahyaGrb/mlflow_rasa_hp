@@ -10,6 +10,7 @@ entry_points:
           max_runs: {type: int, default: 10}
           metric: {type: string, default: "f1-intent"}
           algo: {type: string, default: "tpe.suggest"}
+          max_p: {type: int, default: None}
           config_template: {type: string, default: "../files/template_config.yml"}
           train_data: {type: string, default: "../files/training_data.yml"}
           validation_data: {type: string, default: "../files/test_data.yml"}
