@@ -1,14 +1,21 @@
-name: multistep_example
+name: track_example
 
+
+conda: ../environment.yml
 
 entry_points:
   train:
-    # parameters:
-    #     file_importer: E2EImporter
-    command: "python train.py"
+    command: "python -m src.train"
   test:
-    # parameters:
-    #     file_importer: E2EImporter
-    command: "python test.py"
+    command: "python src/test.py"
   main:
-    command: "python main.py"
+    parameters:
+          params: {type: dict, default: '{"epochs": 10, "threshold": 0.3, "model": "fr_core_news_md"}'}
+          config_template: {type: string, default: "../files/training_data.yml"}
+          train_data: {type: string, default: "../files/config.yml"}
+          validation_data: {type: string, default: "../files/test_data.yml"}
+    command: "python main.py
+                             --params {params}
+                             {config_template}
+                             {train_data}
+                             {validation_data}"

@@ -1,6 +1,6 @@
 from hyperopt import fmin, tpe, rand
 from space import search_space
-import os
+from src.utils import _transform_uri_to_path, _get_run_config
 import time
 import logging
 import sys
@@ -8,7 +8,7 @@ import mlflow
 import numpy as np
 import click
 import tempfile
-from urllib.parse import urlparse
+
 
 from concurrent.futures import ThreadPoolExecutor
 from mlflow.tracking import MlflowClient
@@ -23,31 +23,14 @@ def _get_or_run(entrypoint, parameters, run_id, experiment_id, synchronous=True)
     logger.info(
         f"Launching new run for entrypoint={entrypoint} and parameters={parameters}"
     )
-    submitted_run = mlflow.projects.run(".", entrypoint, parameters=parameters, env_manager="conda", synchronous = synchronous, run_id=run_id, experiment_id=experiment_id)
+    submitted_run = mlflow.projects.run(".", entrypoint, parameters=parameters, synchronous = synchronous, run_id=run_id, experiment_id=experiment_id)
     succeeded = submitted_run.wait()
     return MlflowClient().get_run(submitted_run.run_id)
 
-def _transform_uri_to_path(uri, sub_directory = ""):
-    parsed_url = urlparse(uri)
-    # Get the path from the parsed URL
-    path = parsed_url.path
-    # Make the path absolute using os.path.abspath()
-    abs_path = os.path.abspath(path)
-    # Get the list of files in the directory
-    if sub_directory:
-        files_path = os.path.join(abs_path, sub_directory)
-        files = os.listdir(files_path)
-        # Get the first file in the list (assuming there is at least one file in the directory)
-        file = files[0]
-        # Create the new path by combining the file name with the current working directory
-        return os.path.join(files_path, file)
-    return abs_path
-
-
 @click.command(help="Perform hyperparameter search with Hyperopt library. Optimize dl_train target.")
-@click.argument("config_template", default="../files/hyperopt/template_config.yml")
-@click.argument("train_data", default="../files/hyperopt/training_data.yml")
-@click.argument("validation_data", default="../files/hyperopt/test_data.yml")
+@click.argument("config_template", default="../files/config.yml")
+@click.argument("train_data", default="../files/training_data.yml")
+@click.argument("validation_data", default="../files/test_data.yml")
 @click.option("--max-runs", type=click.INT, default=10, help="Maximum number of runs to evaluate.")
 @click.option("--metric", type=click.STRING, default="f1_intent", help="Metric to optimize on.")
 @click.option("--algo", type=click.STRING, default="tpe.suggest", help="Optimizer algorithm.")
@@ -87,22 +70,14 @@ def workflow(config_template, train_data, validation_data,max_runs, metric, algo
 
                 # Creating temporary config file containing space variables
                 with tempfile.TemporaryDirectory() as temp_config_dir:
-                    generated_config = f"{temp_config_dir}/run_config.yml"
-                    config_template_path = os.path.relpath(config_template)
-                    train_data_path = os.path.relpath(train_data)
-                    validation_data_path = os.path.relpath(validation_data)
-
-                    with open(config_template_path) as f:
-                        template_config_yml = f.read().format(**space)
-                        with open(generated_config, 'w+') as temp_f:
-                            temp_f.write(template_config_yml)
+                    generated_config = _get_run_config(config_template, space, temp_config_dir)
 
                     logger.info("Starting to train")
-                    train_model = _get_or_run("train", {"config":generated_config, "training":train_data_path}, child_run.info.run_id,experiment_id)
+                    train_model = _get_or_run("train", {"config":generated_config, "training":train_data}, child_run.info.run_id,experiment_id)
                     logger.info("Training complete")
                     model_path = _transform_uri_to_path(train_model.info.artifact_uri, "model")
                     logger.info("Starting to test")
-                    test_model = _get_or_run("test", {"model_path": model_path, "validation": validation_data_path}, child_run.info.run_id,experiment_id)
+                    test_model = _get_or_run("test", {"model_path": model_path, "validation": validation_data}, child_run.info.run_id,experiment_id)
                     logger.info("Testing complete with the following validation metrics:")
                     metrics = test_model.data.metrics
                     logger.info(metrics)
@@ -112,6 +87,7 @@ def workflow(config_template, train_data, validation_data,max_runs, metric, algo
         return eval
 
     with mlflow.start_run() as run:
+        mlflow.set_experiment("hyperopt_rasa")
         experiment_id = run.info.experiment_id
         # activate multithreading
         runs = [(np.random.uniform(1e-5, 1e-1), np.random.uniform(0, 1.0)) for _ in range(max_runs)]
