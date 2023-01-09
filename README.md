@@ -26,7 +26,7 @@ For `hyper_opt`, you need to customize a  `template_config.py` by replacing the 
 
 Track is a simple workflow that trains and tests rasa using a MLFlow project workflow method.
 
-CD to the `track_rasa` rasa directory and run `mlflow run .`
+At the root directory, run `mlflow run track_rasa --env-manager=local`
 
 You can track the results in Mlflow running `mlflow ui` and opening `http://127.0.0.1:5000` from you browser.
 
@@ -34,11 +34,11 @@ You can track the results in Mlflow running `mlflow ui` and opening `http://127.
 
 `Hyperopt_rasa` is a more complete workflow that spans a search space in search for best parameters. It uses Mlflow prallelism and multithreading for faster execution.
 
-Same as for `track_rasa`, you can use this project running `mlflow run .` inside  `track_rasa` directory.
+Same as for `track_rasa`, you can use this project running `mlflow run hyperopt_rasa --env-manager=local ` ifrom root directory.
 
 You can track the results in Mlflow running `mlflow ui` and opening `http://127.0.0.1:5000` from you browser.
 
-### github project usage
+### Github project usage (WIP)
 
 you can use this project standalone withou cloning and so by leveraging the MLProjects feature
 
