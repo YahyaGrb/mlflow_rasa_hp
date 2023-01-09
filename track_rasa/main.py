@@ -4,8 +4,8 @@ import mlflow
 import logging
 import click
 import tempfile
-
-from src.utils import _transform_uri_to_path, _get_run_config
+sys.path.insert(1, "../src")
+from utils import _transform_uri_to_path, _get_run_config
 from mlflow.tracking import MlflowClient
 
 

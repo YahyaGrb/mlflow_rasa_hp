@@ -5,9 +5,9 @@ conda: ../environment.yml
 
 entry_points:
   train:
-    command: "python -m src.train"
+    command: "python ../src/train.py"
   test:
-    command: "python src/test.py"
+    command: "python test.py"
   main:
     parameters:
           params: {type: dict, default: '{"epochs": 10, "threshold": 0.3, "model": "fr_core_news_md"}'}

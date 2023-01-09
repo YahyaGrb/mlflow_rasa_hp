@@ -133,3 +133,5 @@ mlruns/
 
 #rasa
 .rasa/
+#venv
+.mlflow

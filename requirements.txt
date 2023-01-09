@@ -1,0 +1,6 @@
+mlflow
+rasa==3.1.0
+spacy
+fr-dep-news-trf @ https://github.com/explosion/spacy-models/releases/download/fr_dep_news_trf-3.4.0/fr_dep_news_trf-3.4.0-py3-none-any.whl
+fr-core-news-md @ https://github.com/explosion/spacy-models/releases/download/fr_core_news_md-3.4.0/fr_core_news_md-3.4.0-py3-none-any.whl
+fr-core-news-sm @ https://github.com/explosion/spacy-models/releases/download/fr_core_news_sm-3.4.0/fr_core_news_sm-3.4.0-py3-none-any.whl
