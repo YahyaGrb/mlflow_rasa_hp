@@ -7,6 +7,7 @@ import sys
 import mlflow
 import numpy as np
 import click
+import tempfile
 from urllib.parse import urlparse
 
 from concurrent.futures import ThreadPoolExecutor
@@ -22,22 +23,25 @@ def _get_or_run(entrypoint, parameters, run_id, experiment_id, synchronous=True)
     logger.info(
         f"Launching new run for entrypoint={entrypoint} and parameters={parameters}"
     )
-    submitted_run = mlflow.projects.run(".", entrypoint, parameters=parameters, env_manager="local", synchronous = synchronous, run_id=run_id, experiment_id=experiment_id)
+    submitted_run = mlflow.projects.run(".", entrypoint, parameters=parameters, env_manager="conda", synchronous = synchronous, run_id=run_id, experiment_id=experiment_id)
     succeeded = submitted_run.wait()
     return MlflowClient().get_run(submitted_run.run_id)
 
-def _transform_uri_to_path(uri):
+def _transform_uri_to_path(uri, sub_directory = ""):
     parsed_url = urlparse(uri)
     # Get the path from the parsed URL
     path = parsed_url.path
     # Make the path absolute using os.path.abspath()
     abs_path = os.path.abspath(path)
     # Get the list of files in the directory
-    files = os.listdir(abs_path)
-    # Get the first file in the list (assuming there is at least one file in the directory)
-    file = files[0]
-    # Create the new path by combining the file name with the current working directory
-    return os.path.join(abs_path, file)
+    if sub_directory:
+        files_path = os.path.join(abs_path, sub_directory)
+        files = os.listdir(files_path)
+        # Get the first file in the list (assuming there is at least one file in the directory)
+        file = files[0]
+        # Create the new path by combining the file name with the current working directory
+        return os.path.join(files_path, file)
+    return abs_path
 
 
 @click.command(help="Perform hyperparameter search with Hyperopt library. Optimize dl_train target.")
@@ -45,7 +49,7 @@ def _transform_uri_to_path(uri):
 @click.argument("train_data", default="../files/hyperopt/training_data.yml")
 @click.argument("validation_data", default="../files/hyperopt/test_data.yml")
 @click.option("--max-runs", type=click.INT, default=10, help="Maximum number of runs to evaluate.")
-@click.option("--metric", type=click.STRING, default="f1-intent", help="Metric to optimize on.")
+@click.option("--metric", type=click.STRING, default="f1_intent", help="Metric to optimize on.")
 @click.option("--algo", type=click.STRING, default="tpe.suggest", help="Optimizer algorithm.")
 def workflow(config_template, train_data, validation_data,max_runs, metric, algo):
     """
@@ -82,30 +86,28 @@ def workflow(config_template, train_data, validation_data,max_runs, metric, algo
                 logger.info(f"Search space: {space}")
 
                 # Creating temporary config file containing space variables
-                os.makedirs('./tmp_configs', exist_ok=True)
-                config_path = "./tmp_configs/run_config.yml"
-                config_template_path = os.path.relpath(config_template)
-                train_data_path = os.path.relpath(train_data)
-                validation_data_path = os.path.relpath(validation_data)
+                with tempfile.TemporaryDirectory() as temp_config_dir:
+                    generated_config = f"{temp_config_dir}/run_config.yml"
+                    config_template_path = os.path.relpath(config_template)
+                    train_data_path = os.path.relpath(train_data)
+                    validation_data_path = os.path.relpath(validation_data)
 
-                with open(config_template_path) as f:
-                    template_config_yml = f.read().format(**space)
-                    with open(config_path, 'w+') as temp_f:
-                        temp_f.write(template_config_yml)
+                    with open(config_template_path) as f:
+                        template_config_yml = f.read().format(**space)
+                        with open(generated_config, 'w+') as temp_f:
+                            temp_f.write(template_config_yml)
 
-                logger.info("Starting to train")
-                train_model = _get_or_run("train", {"config":config_path, "training":train_data_path}, child_run.info.run_id,experiment_id)
-                logger.info("Training complete")
-                model_uri = os.path.join(train_model.info.artifact_uri, "model")
-                logger.info(model_uri)
-                model_path = _transform_uri_to_path(model_uri)
-                logger.info("Starting to test")
-                test_model = _get_or_run("test", {"model_path": model_path, "validation": validation_data_path}, child_run.info.run_id,experiment_id)
-                logger.info("Testing complete")
-                metrics = test_model.data.metrics
-                print(metrics)
-                test_loss = 1 - metrics[metric]
-                mlflow.log_params(params = space)
+                    logger.info("Starting to train")
+                    train_model = _get_or_run("train", {"config":generated_config, "training":train_data_path}, child_run.info.run_id,experiment_id)
+                    logger.info("Training complete")
+                    model_path = _transform_uri_to_path(train_model.info.artifact_uri, "model")
+                    logger.info("Starting to test")
+                    test_model = _get_or_run("test", {"model_path": model_path, "validation": validation_data_path}, child_run.info.run_id,experiment_id)
+                    logger.info("Testing complete with the following validation metrics:")
+                    metrics = test_model.data.metrics
+                    logger.info(metrics)
+                    test_loss = 1 - metrics[metric]
+                    mlflow.log_params(params = space)
             return test_loss
         return eval
 
@@ -130,19 +132,20 @@ def workflow(config_template, train_data, validation_data,max_runs, metric, algo
             best_test_loss = _inf
             best_run = None
             for r in runs:
-                if r.data.metrics[metric] < best_test_loss:
+                if 1 - r.data.metrics[metric] < best_test_loss:
                     best_run = r
-                    best_test_loss = r.data.metrics[metric]
-                    # get best config here
-                    # with open(config_template) as f:
-                    #     config_yml = f.read().format(**best_config)
-                    #     logger.info("The best configuration is: \n{}\n".format(config_yml))
+                    best_test_loss = 1 - r.data.metrics[metric]
+            best_config_path = _transform_uri_to_path(best_run.info.artifact_uri, "config")
+            with open(best_config_path) as f:
+                config_yml = f.read()
+                logger.info("The best configuration is: \n{}\n".format(config_yml))
             mlflow.set_tag("best_run", best_run.info.run_id)
             mlflow.log_metrics(
                 {
-                    "Best_{}".format(metric): best_test_loss,
+                    "Best_{}_loss".format(metric): best_test_loss,
                 }
             )
+            mlflow.log_artifacts(local_dir=_transform_uri_to_path(best_run.info.artifact_uri))
     logger.info(f"Total execution time: {time.time() - start_time} seconds")
 
 
