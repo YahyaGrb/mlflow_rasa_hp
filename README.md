@@ -18,7 +18,15 @@ Second, you need to update the files of the sub-project you want to exeucte by a
 
 You can generate a test/train split in rasa using the command `rasa data split nlu` from you rasa project root directory. Than copy/paste them in files.
 
-For `hyper_opt`, you need to customize a  `template_config.py` by replacing the values with their keys, and then provide the keys possible values withing `space.py` file.
+`config.yml` should be added as a template as in the example, where you replace the values with the their name.
+
+You need to load `Spacy` model if you config uses spacy.
+
+For this code to run you will need to do when you **venv** is active:
+
+```
+spacy download 'fr_dep_news_trf' && spacy download 'fr_core_news_md' && spacy download 'fr_core_news_sm'
+```
 
 ## Usage
 
@@ -34,7 +42,7 @@ You can track the results in Mlflow running `mlflow ui` and opening `http://127.
 
 `Hyperopt_rasa` is a more complete workflow that spans a search space in search for best parameters. It uses Mlflow prallelism and multithreading for faster execution.
 
-Same as for `track_rasa`, you can use this project running `mlflow run hyperopt_rasa --env-manager=local ` ifrom root directory.
+Same as for `track_rasa`, you can use this project running `mlflow run hyperopt_rasa --env-manager=local ` from root directory.
 
 You can track the results in Mlflow running `mlflow ui` and opening `http://127.0.0.1:5000` from you browser.
 
