@@ -1,5 +1,8 @@
 name: hyperopt_example
 
+
+conda: environment.yaml
+
 entry_points:
   train:
     command: "python train.py"
@@ -7,8 +10,8 @@ entry_points:
     command: "python test.py"
   main:
     parameters:
-          max_runs: {type: int, default: 10}
-          metric: {type: string, default: "f1-intent"}
+          max_runs: {type: int, default: 2}
+          metric: {type: string, default: "f1_intent"}
           algo: {type: string, default: "tpe.suggest"}
           config_template: {type: string, default: "../files/hyperopt/template_config.yml"}
           train_data: {type: string, default: "../files/hyperopt/training_data.yml"}
