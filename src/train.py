@@ -1,10 +1,9 @@
-from rasa.model_training import train_nlu
-
 import tempfile
 import mlflow
 import click
 import time
 
+from rasa.model_training import train_nlu
 
 
 

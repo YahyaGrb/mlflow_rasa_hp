@@ -1,7 +1,7 @@
 name: hyperopt_example
 
 
-# python_env: ../environment.yml
+python_env: environment.yml
 
 entry_points:
   train:

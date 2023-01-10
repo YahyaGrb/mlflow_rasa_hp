@@ -1,10 +1,6 @@
-# MLFLOW tracking and Hyper paramater optimisation for Rasa
+# MLFLOW Hyper paramater optimisation for Rasa
 
 This project aims to provide an example on how to use MLFLOW within rasa in order to track `config.yaml` updates impact on the bot performance.
-
-The project is organized in two parts totally independent from each other.
-
-The `Track_rasa` serves to track a rasa train performance for a single config file.
 
 The `Hyperopt_rasa` serves to automatically track multiple experiements of rasa train on a defined search space using the hyperopt methodology and identifies the best combination.
 
@@ -16,7 +12,7 @@ First you need to create and setup a virtual environment to install dependencies
 python3.8 -m venv .mlflow 
 source .mlflow/bin/activate
 pip install --upgrade pip
-pip install -r requirements.txt
+pip install mlflow
 ```
 
 Second, you need to update the files of the sub-project you want to exeucte by adding you own `test_data.yml `and `training_data.yml` and `config.yml` files.
@@ -29,35 +25,21 @@ You need to load `Spacy` model if you config uses spacy.
 
 ## Usage
 
-### Track_rasa
+The code is organized as a `MLFLOW Project`. It contains a complete workflow that spans a search space in search for best parameters and leverages multithreading for faster execution.
 
-Track is a simple workflow that trains and tests rasa using a MLFlow project workflow method.
+You can use this project in different ways:
 
-At the root directory, run `mlflow run track_rasa --env-manager=local <pass you own params if needed>`
+- By running from root directory: `mlflow run. <pass you own params if needed>` .
+- If you don't want to clone this project, you canrun this command :
+  - without default params: `mlflow run git@github.com:YahyaGrb/mlflow_rasa_hp.git`
+  - with your own params/files: `mlflow run git@github.com:YahyaGrb/mlflow_rasa_hp.git -P <your params if needed>`
+- From a jupyter notebook:
+  - ```
+    import mlflow
+    project_uri = "https://github.com/YahyaGrb/mlops_rasa/mlflow_rasa_hp"
+    params = your_params # (as needed by the project)
 
-You can track the results in Mlflow running `mlflow ui` and opening `http://127.0.0.1:5000` from you browser.
+    mlflow.run(project_uri, parameter=params)
+    ```
 
-### Hyperopt_rasa
-
-`Hyperopt_rasa` is a more complete workflow that spans a search space in search for best parameters. It uses Mlflow prallelism and multithreading for faster execution.
-
-Same as for `track_rasa`, you can use this project running `mlflow run hyperopt_rasa --env-manager=local <pass you own params if needed>` from root directory.
-
-You can track the results in Mlflow running `mlflow ui` and opening `http://127.0.0.1:5000` from you browser.
-
-### Github project usage (WIP)
-
-you can use this project standalone withou cloning and so by leveraging the MLProjects feature
-
-all you need is
-
-but i need to divi it into two different projects so that will work, or add a param to launch either one or the other (nt sure this will work))
-
-```
-import mlflow
-project_uri = "https://github.com/YahyaGrb/mlops_rasa/track_rasa" # or hyperopt_rasa
-params = your_params # (as accepted by the project)
-
-mlflow.run(project_uri, parameter=params)
-
-```
+## ResultsYou can track the results in Mlflow running `mlflow ui` and opening `http://127.0.0.1:5000` from you browser.
