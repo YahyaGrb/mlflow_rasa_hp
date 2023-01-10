@@ -2,7 +2,7 @@
 
 This project aims to provide an example on how to use MLFLOW within rasa in order to track `config.yaml` updates impact on the bot performance.
 
-The `Hyperopt_rasa` serves to automatically track multiple experiements of rasa train on a defined search space using the hyperopt methodology and identifies the best combination.
+It serves to automatically track multiple experiements of rasa train on a defined search space using the hyperopt methodology and identifies the best combination.
 
 ## Installation
 
@@ -20,8 +20,6 @@ Second, you need to update the files of the sub-project you want to exeucte by a
 You can generate a test/train split in rasa using the command `rasa data split nlu` from you rasa project root directory. Than copy/paste them in files.
 
 `config.yml` should be added as a template as in the example, where you replace the values with the their name.
-
-You need to load `Spacy` model if you config uses spacy.
 
 ## Usage
 
@@ -42,4 +40,6 @@ You can use this project in different ways:
     mlflow.run(project_uri, parameter=params)
     ```
 
-## ResultsYou can track the results in Mlflow running `mlflow ui` and opening `http://127.0.0.1:5000` from you browser.
+## Results
+
+You can track the results in Mlflow running `mlflow ui` and opening `http://127.0.0.1:5000` from you browser.
