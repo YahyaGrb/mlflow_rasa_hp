@@ -2,7 +2,7 @@
 
 This project aims to provide an example on how to use MLFLOW within rasa in order to track `config.yaml` updates impact on the bot performance.
 
-It serves to automatically track multiple experiements of rasa train on a defined search space using the hyperopt methodology and identifies the best combination.
+It serves to automatically track multiple experiments of rasa train on a defined search space using the hyperopt methodology and identifies the best combination.
 
 ## Installation
 
@@ -15,7 +15,7 @@ pip install --upgrade pip
 pip install mlflow
 ```
 
-Second, you need to update the files of the sub-project you want to exeucte by adding you own `test_data.yml `and `training_data.yml` and `config.yml` files.
+Second, you need to update the files of the sub-project you want to execute by adding your own `test_data.yml `and `training_data.yml` and `config.yml` files.
 
 You can generate a test/train split in rasa using the command `rasa data split nlu` from you rasa project root directory. Than copy/paste them in files.
 
@@ -28,7 +28,7 @@ The code is organized as a `MLFLOW Project`. It contains a complete workflow tha
 You can use this project in different ways:
 
 - By running from root directory: `mlflow run. <pass you own params if needed>` .
-- If you don't want to clone this project, you canrun this command :
+- If you don't want to clone this project, you can run this command :
   - without default params: `mlflow run git@github.com:YahyaGrb/mlflow_rasa_hp.git`
   - with your own params/files: `mlflow run git@github.com:YahyaGrb/mlflow_rasa_hp.git -P <your params if needed>`
 - From a jupyter notebook:
@@ -42,4 +42,4 @@ You can use this project in different ways:
 
 ## Results
 
-You can track the results in Mlflow running `mlflow ui` and opening `http://127.0.0.1:5000` from you browser.
+You can track the results in Mlflow by running `mlflow ui` and opening `http://127.0.0.1:5000` from your browser.
