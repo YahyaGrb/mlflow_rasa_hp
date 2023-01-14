@@ -27,7 +27,7 @@ The code is organized as a `MLFLOW Project`. It contains a complete workflow tha
 
 You can use this project in different ways:
 
-- By running from root directory: `mlflow run. <pass you own params if needed>` .
+- By running from root directory: `mlflow run . <pass you own params if needed>` .
 - If you don't want to clone this project, you can run this command :
   - without default params: `mlflow run git@github.com:YahyaGrb/mlflow_rasa_hp.git`
   - with your own params/files: `mlflow run git@github.com:YahyaGrb/mlflow_rasa_hp.git -P <your params if needed>`
